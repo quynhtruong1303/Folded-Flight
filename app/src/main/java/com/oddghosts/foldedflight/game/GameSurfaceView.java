@@ -38,6 +38,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private float liftForce;
     private float forwardThrust;
     private float dragCoefficient;
+    private float maxSpeed;
 
     // Camera
     private float cameraX = 0;
@@ -99,13 +100,21 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         // Set difficulty parameters
         if (difficulty.equals("HARD")) {
-            liftForce = 2500.0f;
+            liftForce = 2000.0f;
             forwardThrust = 200.0f;
             dragCoefficient = 0.008f;
+            maxSpeed = 2000.0f;
         } else {
             liftForce = 1500.0f;
             forwardThrust = 100.0f;
             dragCoefficient = 0.005f;
+            maxSpeed = 1200.0f;
+        }
+
+        // Apply max speed to plane if it exists
+        if (plane != null) {
+            plane.setMaxSpeed(maxSpeed);
+            plane.setDragCoefficient(dragCoefficient);
         }
     }
 
@@ -173,6 +182,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         // Set extremely large world width for infinite scrolling
         plane.setWorldBounds(Float.MAX_VALUE, screenHeight);
         plane.setDragCoefficient(dragCoefficient);
+        plane.setMaxSpeed(maxSpeed);
     }
 
     @Override

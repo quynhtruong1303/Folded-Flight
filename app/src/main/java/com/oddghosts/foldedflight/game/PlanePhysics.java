@@ -4,6 +4,7 @@ package com.oddghosts.foldedflight.game;
  * Physics engine for the paper plane
  * Adapted from Elijah Camp
  * Created: 10/30/2025
+ * Modified: Added speed limit and infinite scrolling support
  */
 public class PlanePhysics {
 
@@ -23,9 +24,12 @@ public class PlanePhysics {
     private float mass;
     private float radius;
 
+    // Speed limit
+    private float maxSpeed = Float.MAX_VALUE; // Default unlimited
+
     // Physics constants
     private static final float GRAVITY = 500.0f; // Pixels per second squared
-    private float dragCoefficient = 0.01f;
+    private float dragCoefficient = 0.005f;
 
     // World bounds
     private float worldWidth = 800;
@@ -33,8 +37,8 @@ public class PlanePhysics {
 
     // Bounce and friction coefficients
     private static final float BOUNCE_DAMPING = 0.6f;
-    private static final float FRICTION = 0.8f;
-    private static final float MIN_VELOCITY = 50.0f;
+    private static final float GROUND_FRICTION = 0.95f; // Reduced friction to keep moving
+    private static final float MIN_FORWARD_VELOCITY = 100.0f; // Minimum forward speed
 
     public PlanePhysics(float x, float y, float radius, float mass) {
         this.x = x;
@@ -45,6 +49,13 @@ public class PlanePhysics {
         this.velocityY = 0;
         this.accelX = 0;
         this.accelY = 0;
+    }
+
+    /**
+     * Set maximum speed limit
+     */
+    public void setMaxSpeed(float maxSpeed) {
+        this.maxSpeed = maxSpeed;
     }
 
     /**
@@ -61,6 +72,14 @@ public class PlanePhysics {
         // Update velocity
         velocityX += accelX * deltaTime;
         velocityY += accelY * deltaTime;
+
+        // Apply speed limit
+        float speed = (float) Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+        if (speed > maxSpeed) {
+            float scale = maxSpeed / speed;
+            velocityX *= scale;
+            velocityY *= scale;
+        }
 
         // Update position
         x += velocityX * deltaTime;
@@ -89,18 +108,20 @@ public class PlanePhysics {
 
     /**
      * Check collision with world bounds
+     * Modified for infinite horizontal scrolling
      */
     private void checkBounds() {
         // Bottom collision (ground)
         if (y + radius >= worldHeight) {
             y = worldHeight - radius;
             velocityY *= -BOUNCE_DAMPING;
-            velocityX *= FRICTION;
 
-            // Stop bouncing if moving too slow
-            if (Math.abs(velocityY) < MIN_VELOCITY && Math.abs(velocityX) < MIN_VELOCITY) {
-                velocityY = 0;
-                velocityX = 0;
+            // Apply minimal friction but maintain forward momentum
+            velocityX *= GROUND_FRICTION;
+
+            // Ensure minimum forward velocity for infinite scrolling
+            if (velocityX < MIN_FORWARD_VELOCITY) {
+                velocityX = MIN_FORWARD_VELOCITY;
             }
         }
 
@@ -110,16 +131,13 @@ public class PlanePhysics {
             velocityY *= -BOUNCE_DAMPING;
         }
 
-        // Right wall (shouldn't happen in infinite scrolling)
-        if (x + radius >= worldWidth) {
-            x = worldWidth - radius;
-            velocityX *= -BOUNCE_DAMPING;
-        }
+        // NO RIGHT WALL CHECK - allows infinite scrolling
+        // The game world extends infinitely to the right
 
-        // Left wall
+        // Left wall (prevent going backwards)
         if (x - radius <= 0) {
             x = radius;
-            velocityX *= -BOUNCE_DAMPING;
+            velocityX = Math.max(velocityX, MIN_FORWARD_VELOCITY);
         }
     }
 
