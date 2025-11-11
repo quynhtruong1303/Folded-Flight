@@ -8,4 +8,8 @@
     <string name="select_plane_text">Select Plane Color</string>
     <string name="start_game_button">START GAME</string>
     <string name="back_button">BACK</string>
+    <string name="start_timer">TIME: 00:00</string>
+    <string name="paused_text">PAUSED</string>
+    <string name="resume_text">RESUME</string>
+    <string name="main_menu_text">MAIN MENU</string>
 </resources>

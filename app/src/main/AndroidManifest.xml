@@ -32,6 +32,14 @@
             android:configChanges="orientation|screenSize">
         </activity>
 
+        <!-- Gameplay Activity -->
+        <activity
+            android:name=".GameplayActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize">
+        </activity>
+
     </application>
 
 </manifest>

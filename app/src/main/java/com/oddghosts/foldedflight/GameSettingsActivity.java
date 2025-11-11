@@ -216,19 +216,14 @@ public class GameSettingsActivity extends AppCompatActivity {
      * Start the game with selected settings
      */
     private void startGame() {
-        // TODO: Create GameActivity and start it with the selected settings
-        Toast.makeText(this,
-                "Starting Game!\nMap: " + selectedMap + "\nPlane: " + selectedPlaneColor,
-                Toast.LENGTH_LONG).show();
+        // Start the GameplayActivity with selected settings
+        Intent intent = new Intent(this, GameplayActivity.class);
+        intent.putExtra("MAP", selectedMap);
+        intent.putExtra("PLANE_COLOR", selectedPlaneColor);
+        intent.putExtra("DIFFICULTY", selectedDifficulty);
+        startActivity(intent);
 
-        // Example of how to pass data to game activity:
-        // Intent intent = new Intent(this, GameActivity.class);
-        // intent.putExtra("MAP", selectedMap);
-        // intent.putExtra("PLANE_COLOR", selectedPlaneColor);
-        // startActivity(intent);
 
-        // For now, just go back to main menu after showing toast
-        // Remove this later when you have GameActivity
         finish();
     }
 }
