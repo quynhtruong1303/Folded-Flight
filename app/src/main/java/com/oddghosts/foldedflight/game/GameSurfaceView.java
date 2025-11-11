@@ -255,6 +255,30 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
     }
 
+    /**
+     * Reset the game to initial state
+     */
+    public void resetGame() {
+        // Reset flying state
+        isFlying = false;
+
+        // Reset camera
+        cameraX = 0;
+
+        // Reset touch controls
+        upPressed = false;
+        downPressed = false;
+        touchStartY = 0;
+
+        // Reset plane physics to starting position
+        if (plane != null) {
+            plane.reset(100, screenHeight / 2.0f);
+        }
+
+        // Reset frame time
+        lastFrameTime = System.nanoTime();
+    }
+
     @Override
     public void run() {
         while (isRunning) {

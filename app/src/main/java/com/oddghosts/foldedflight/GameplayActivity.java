@@ -232,7 +232,20 @@ public class GameplayActivity extends AppCompatActivity {
     }
 
     private void restartGame() {
-        // TODO: implement restart game
+        // Reset timer
+        elapsedTime = 0;
+        startTime = System.currentTimeMillis();
+        timerText.setText("TIME: 00:00");
+
+        // Reset game surface
+        if (gameSurfaceView != null) {
+            gameSurfaceView.resetGame();
+        }
+
+        // Restart timer
+        timerHandler.postDelayed(timerRunnable, 0);
+
+        resumeGame();
     }
 
     private void exitToMenu() {
