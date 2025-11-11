@@ -148,10 +148,27 @@ public class GameplayActivity extends AppCompatActivity {
         });
         layout.addView(resumeButton);
 
-        // Add spacing
+        // spacing
         View spacer = new View(this);
         spacer.setLayoutParams(new LinearLayout.LayoutParams(1, 30));
         layout.addView(spacer);
+
+        // Restart Button
+        PixelButton restartButton = new PixelButton(this);
+        restartButton.setText(R.string.restart_text);
+        restartButton.setCustomFont(R.font.pixelboy);
+        restartButton.setCustomTextSize(56f);
+        restartButton.setButtonBackgroundColor(0xFF4A90E2);
+        restartButton.setLayoutParams(new LinearLayout.LayoutParams(
+                300, 100
+        ));
+        restartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                restartGame();
+            }
+        });
+        layout.addView(restartButton);
 
         // Exit button
         PixelButton exitButton = new PixelButton(this);
@@ -214,6 +231,10 @@ public class GameplayActivity extends AppCompatActivity {
         pauseDialog.dismiss();
     }
 
+    private void restartGame() {
+        // TODO: implement restart game
+    }
+
     private void exitToMenu() {
         isGameRunning = false;
         finish();
@@ -239,6 +260,7 @@ public class GameplayActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         if (!isPaused) {
             pauseGame();
         }

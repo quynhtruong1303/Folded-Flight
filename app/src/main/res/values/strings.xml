@@ -12,4 +12,5 @@
     <string name="paused_text">PAUSED</string>
     <string name="resume_text">RESUME</string>
     <string name="main_menu_text">MAIN MENU</string>
+    <string name="restart_text">RESTART</string>
 </resources>

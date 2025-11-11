@@ -6,10 +6,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import androidx.core.content.res.ResourcesCompat;
+
 import com.oddghosts.foldedflight.R;
 
 public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
@@ -22,6 +26,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     // Surface holder
     private SurfaceHolder surfaceHolder;
+    private Context context;
 
     // Game settings
     private String mapType = "CITY";
@@ -51,9 +56,6 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     // Background scaling options
     public enum BackgroundMode {
         SCALE_TO_FIT_HEIGHT,    // Scale to match height, scroll horizontally
-        SCALE_TO_COVER,         // Scale to cover entire screen, may crop
-        TILE_HORIZONTAL,        // Tile the background horizontally
-        PARALLAX_LAYERS         // Multiple background layers (requires multiple images)
     }
 
     private BackgroundMode backgroundMode = BackgroundMode.SCALE_TO_FIT_HEIGHT;
@@ -98,6 +100,8 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         paint = new Paint();
         paint.setAntiAlias(true);
         paint.setFilterBitmap(true); // Enable filtering for smooth scaling
+
+        this.context = context;
 
         setFocusable(true);
     }
@@ -365,17 +369,37 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void drawStartInstructions(Canvas canvas) {
-        Paint textPaint = new Paint();
-        textPaint.setColor(Color.WHITE);
-        textPaint.setTextSize(60);
-        textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setShadowLayer(4, 2, 2, Color.BLACK);
+        Typeface customTypeface = ResourcesCompat.getFont(context, R.font.pixelboy);
 
-        canvas.drawText("TAP TO LAUNCH!", screenWidth / 2, screenHeight / 2, textPaint);
+        // Stroke paint (black outline)
+        Paint strokePaint = new Paint();
+        strokePaint.setColor(Color.BLACK);
+        strokePaint.setTextSize(80);
+        strokePaint.setTextAlign(Paint.Align.CENTER);
+        strokePaint.setTypeface(customTypeface);
+        strokePaint.setStyle(Paint.Style.STROKE);
+        strokePaint.setStrokeWidth(8);
 
-        textPaint.setTextSize(40);
-        canvas.drawText("Hold UP side to climb", screenWidth / 2, screenHeight / 2 + 80, textPaint);
-        canvas.drawText("Hold DOWN side to dive", screenWidth / 2, screenHeight / 2 + 130, textPaint);
+        // Fill paint (white text)
+        Paint fillPaint = new Paint();
+        fillPaint.setColor(Color.WHITE);
+        fillPaint.setTextSize(80);
+        fillPaint.setTextAlign(Paint.Align.CENTER);
+        fillPaint.setTypeface(customTypeface);
+
+        // ===== MAIN TITLE =====
+        canvas.drawText("TAP TO LAUNCH!", screenWidth / 2, screenHeight / 2, strokePaint);
+        canvas.drawText("TAP TO LAUNCH!", screenWidth / 2, screenHeight / 2, fillPaint);
+
+        // ===== SUBTEXT =====
+        strokePaint.setTextSize(60);
+        fillPaint.setTextSize(60);
+
+        canvas.drawText("Hold UP side to climb", screenWidth / 2, screenHeight / 2 + 80, strokePaint);
+        canvas.drawText("Hold UP side to climb", screenWidth / 2, screenHeight / 2 + 80, fillPaint);
+
+        canvas.drawText("Hold DOWN side to dive", screenWidth / 2, screenHeight / 2 + 130, strokePaint);
+        canvas.drawText("Hold DOWN side to dive", screenWidth / 2, screenHeight / 2 + 130, fillPaint);
     }
 
     private void drawPlane(Canvas canvas) {
