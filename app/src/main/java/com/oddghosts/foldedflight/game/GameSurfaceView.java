@@ -45,20 +45,12 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     // Touch controls
     private boolean upPressed = false;
     private boolean downPressed = false;
-    private float touchStartY = 0;
 
     // Graphics
-    private Bitmap originalBackgroundBitmap;  // Original unscaled bitmap
-    private Bitmap scaledBackgroundBitmap;    // Scaled for current screen
+    private Bitmap originalBackgroundBitmap;
+    private Bitmap scaledBackgroundBitmap;
     private Bitmap planeBitmap;
     private Paint paint;
-
-    // Background scaling options
-    public enum BackgroundMode {
-        SCALE_TO_FIT_HEIGHT,    // Scale to match height, scroll horizontally
-    }
-
-    private BackgroundMode backgroundMode = BackgroundMode.SCALE_TO_FIT_HEIGHT;
 
     // Screen dimensions
     private int screenWidth;
@@ -67,11 +59,6 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     // Background dimensions
     private int backgroundWidth;
     private int backgroundHeight;
-    private float backgroundScale = 1.0f;
-
-    // For tiling mode
-    private int tileWidth;
-    private int tileHeight;
 
     // Timing
     private long lastFrameTime;
@@ -99,10 +86,9 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         paint = new Paint();
         paint.setAntiAlias(true);
-        paint.setFilterBitmap(true); // Enable filtering for smooth scaling
+        paint.setFilterBitmap(true);
 
         this.context = context;
-
         setFocusable(true);
     }
 
@@ -123,26 +109,16 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
     }
 
-    /**
-     * Set the background scaling mode
-     */
-    public void setBackgroundMode(BackgroundMode mode) {
-        this.backgroundMode = mode;
-        if (screenWidth > 0 && screenHeight > 0) {
-            prepareBackground();
-        }
-    }
-
     private void loadResources() {
-        // Load original background based on map type
+        // Load background based on map type
         if (mapType.equals("CITY")) {
             originalBackgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.city_map);
         } else {
             originalBackgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.forest_map);
         }
 
-        // Prepare background based on selected mode
-        prepareBackground();
+        // Scale background to fit screen height
+        scaleBackgroundToFitHeight();
 
         // Load plane sprite based on color
         int planeResId = R.drawable.white_plane;
@@ -159,34 +135,24 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
         planeBitmap = BitmapFactory.decodeResource(getResources(), planeResId);
 
-        // Scale plane to appropriate size (about 64x64)
+        // Scale plane to appropriate size
         if (planeBitmap != null) {
             planeBitmap = Bitmap.createScaledBitmap(planeBitmap, 192, 192, true);
         }
     }
 
     /**
-     * Prepare background
+     * Scale background to match screen height, maintain aspect ratio
      */
-    private void prepareBackground() {
+    private void scaleBackgroundToFitHeight() {
         if (originalBackgroundBitmap == null || screenHeight == 0 || screenWidth == 0) {
             return;
         }
-        prepareScaleToFitHeight();
-    }
 
-    /**
-     * Scale background to match screen height, maintain aspect ratio
-     * Width may extend beyond screen for scrolling
-     */
-    private void prepareScaleToFitHeight() {
         float scale = (float) screenHeight / originalBackgroundBitmap.getHeight();
-        backgroundScale = scale;
-
         backgroundWidth = (int) (originalBackgroundBitmap.getWidth() * scale);
         backgroundHeight = screenHeight;
 
-        // Create scaled bitmap
         scaledBackgroundBitmap = Bitmap.createScaledBitmap(
                 originalBackgroundBitmap,
                 backgroundWidth,
@@ -200,12 +166,12 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         screenWidth = getWidth();
         screenHeight = getHeight();
 
-        // Load resources after we know screen dimensions
         loadResources();
 
-        // Initialize plane physics (start from left side, middle height)
+        // Initialize plane physics
         plane = new PlanePhysics(100, screenHeight / 2.0f, 32, 1.0f);
-        plane.setWorldBounds(100000, screenHeight);
+        // Set extremely large world width for infinite scrolling
+        plane.setWorldBounds(Float.MAX_VALUE, screenHeight);
         plane.setDragCoefficient(dragCoefficient);
     }
 
@@ -214,11 +180,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         screenWidth = width;
         screenHeight = height;
 
-        // Recalculate background scaling when screen size changes
-        prepareBackground();
+        scaleBackgroundToFitHeight();
 
         if (plane != null) {
-            plane.setWorldBounds(100000, height);
+            plane.setWorldBounds(Float.MAX_VALUE, height);
         }
     }
 
@@ -259,23 +224,15 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
      * Reset the game to initial state
      */
     public void resetGame() {
-        // Reset flying state
         isFlying = false;
-
-        // Reset camera
         cameraX = 0;
-
-        // Reset touch controls
         upPressed = false;
         downPressed = false;
-        touchStartY = 0;
 
-        // Reset plane physics to starting position
         if (plane != null) {
             plane.reset(100, screenHeight / 2.0f);
         }
 
-        // Reset frame time
         lastFrameTime = System.nanoTime();
     }
 
@@ -310,10 +267,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private void update(float deltaTime) {
         if (!isFlying || plane == null) return;
 
-        // Always apply forward thrust
+        // Apply forward thrust
         plane.applyForce(forwardThrust, 0);
 
-        // Apply lift/dive forces based on touch
+        // Apply lift/dive forces
         if (upPressed) {
             plane.applyForce(0, -liftForce);
         }
@@ -323,11 +280,6 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         // Update physics
         plane.update(deltaTime);
-
-        // Ensure minimum forward velocity
-        if (plane.getVelocityX() < 150) {
-            plane.launch(150, plane.getVelocityY());
-        }
 
         // Update camera to follow plane
         cameraX = plane.getX() - screenWidth * 0.25f;
@@ -341,8 +293,8 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 // Clear canvas with sky color
                 canvas.drawColor(Color.rgb(135, 206, 250));
 
-                // Draw background based on mode
-                drawBackground(canvas);
+                // Draw scrolling background
+                drawScrollingBackground(canvas);
 
                 // Draw instructions if not flying
                 if (!isFlying) {
@@ -354,7 +306,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     drawPlane(canvas);
                 }
 
-                // Draw debug info (optional)
+                // Draw debug info
                 if (isFlying && plane != null) {
                     drawDebugInfo(canvas);
                 }
@@ -365,30 +317,24 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     /**
-     * Draw background based on the selected mode
-     */
-    private void drawBackground(Canvas canvas) {
-        if (scaledBackgroundBitmap == null) return;
-        drawScrollingBackground(canvas);
-    }
-
-    /**
-     * Draw scrolling background (SCALE_TO_FIT_HEIGHT)
+     * Draw scrolling background with infinite tiling
      */
     private void drawScrollingBackground(Canvas canvas) {
-        // Calculate visible portion of background
-        float drawX = -cameraX * 0.5f; // Slower scrolling for parallax effect
+        if (scaledBackgroundBitmap == null) return;
 
-        // If background is smaller than needed, tile it
-        if (backgroundWidth < screenWidth * 2) {
-            // Draw multiple copies
-            while (drawX < screenWidth) {
-                canvas.drawBitmap(scaledBackgroundBitmap, drawX, 0, paint);
-                drawX += backgroundWidth;
-            }
-        } else {
-            // Draw single background
-            canvas.drawBitmap(scaledBackgroundBitmap, drawX, 0, paint);
+        // Parallax scrolling (slower than camera movement)
+        float drawX = -cameraX * 0.5f;
+
+        // Use modulo to create seamless infinite tiling
+        // This ensures the background repeats forever
+        drawX = drawX % backgroundWidth;
+        if (drawX > 0) drawX -= backgroundWidth; // Keep drawX negative or zero
+
+        // Draw enough copies to fill the screen
+        float currentX = drawX;
+        while (currentX < screenWidth) {
+            canvas.drawBitmap(scaledBackgroundBitmap, currentX, 0, paint);
+            currentX += backgroundWidth;
         }
     }
 
@@ -411,11 +357,11 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         fillPaint.setTextAlign(Paint.Align.CENTER);
         fillPaint.setTypeface(customTypeface);
 
-        // ===== MAIN TITLE =====
+        // Main title
         canvas.drawText("TAP TO LAUNCH!", screenWidth / 2, screenHeight / 2, strokePaint);
         canvas.drawText("TAP TO LAUNCH!", screenWidth / 2, screenHeight / 2, fillPaint);
 
-        // ===== SUBTEXT =====
+        // Subtext
         strokePaint.setTextSize(60);
         fillPaint.setTextSize(60);
 
@@ -436,7 +382,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         float angle = 0;
         if (Math.abs(plane.getVelocityY()) > 10) {
             angle = (float) Math.toDegrees(Math.atan2(plane.getVelocityY(), plane.getVelocityX()));
-            angle = Math.max(-30, Math.min(30, angle)); // Limit rotation
+            angle = Math.max(-30, Math.min(30, angle));
         }
 
         // Rotate canvas around plane center
@@ -454,7 +400,6 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         canvas.drawText(String.format("Speed: %.0f", plane.getSpeed()), 20, screenHeight - 60, debugPaint);
         canvas.drawText(String.format("Distance: %.0fm", plane.getX() / 10), 20, screenHeight - 20, debugPaint);
-        canvas.drawText("Mode: " + backgroundMode.name(), 20, 60, debugPaint);
     }
 
     @Override
@@ -463,10 +408,8 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                touchStartY = y;
-
                 if (!isFlying) {
-                    // Start the game
+                    // Launch the plane
                     isFlying = true;
                     plane.launch(300, -80);
                     lastFrameTime = System.nanoTime();

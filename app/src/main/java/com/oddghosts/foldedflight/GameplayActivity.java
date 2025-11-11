@@ -80,9 +80,8 @@ public class GameplayActivity extends AppCompatActivity {
         ImageButton pauseButton = findViewById(R.id.pauseButton);
         gameSurfaceView = findViewById(R.id.gameSurfaceView);
 
+        // Set game settings (background automatically scales to fit height)
         gameSurfaceView.setGameSettings(selectedMap, selectedPlaneColor, difficulty);
-
-        gameSurfaceView.setBackgroundMode(GameSurfaceView.BackgroundMode.SCALE_TO_FIT_HEIGHT);
 
         // Pause button listener
         pauseButton.setOnClickListener(new View.OnClickListener() {
@@ -137,9 +136,7 @@ public class GameplayActivity extends AppCompatActivity {
         resumeButton.setCustomFont(R.font.pixelboy);
         resumeButton.setCustomTextSize(56f);
         resumeButton.setButtonBackgroundColor(0xFF4A90E2);
-        resumeButton.setLayoutParams(new LinearLayout.LayoutParams(
-                300, 100
-        ));
+        resumeButton.setLayoutParams(new LinearLayout.LayoutParams(300, 100));
         resumeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,7 +145,7 @@ public class GameplayActivity extends AppCompatActivity {
         });
         layout.addView(resumeButton);
 
-        // spacing
+        // Spacer
         View spacer = new View(this);
         spacer.setLayoutParams(new LinearLayout.LayoutParams(1, 30));
         layout.addView(spacer);
@@ -159,9 +156,7 @@ public class GameplayActivity extends AppCompatActivity {
         restartButton.setCustomFont(R.font.pixelboy);
         restartButton.setCustomTextSize(56f);
         restartButton.setButtonBackgroundColor(0xFF4A90E2);
-        restartButton.setLayoutParams(new LinearLayout.LayoutParams(
-                300, 100
-        ));
+        restartButton.setLayoutParams(new LinearLayout.LayoutParams(300, 100));
         restartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,15 +165,18 @@ public class GameplayActivity extends AppCompatActivity {
         });
         layout.addView(restartButton);
 
+        // Spacer
+        View spacer2 = new View(this);
+        spacer2.setLayoutParams(new LinearLayout.LayoutParams(1, 30));
+        layout.addView(spacer2);
+
         // Exit button
         PixelButton exitButton = new PixelButton(this);
         exitButton.setText(R.string.main_menu_text);
         exitButton.setCustomFont(R.font.pixelboy);
         exitButton.setCustomTextSize(56f);
         exitButton.setButtonBackgroundColor(0xFF9E9E9E);
-        exitButton.setLayoutParams(new LinearLayout.LayoutParams(
-                300, 100
-        ));
+        exitButton.setLayoutParams(new LinearLayout.LayoutParams(300, 100));
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -244,7 +242,6 @@ public class GameplayActivity extends AppCompatActivity {
 
         // Restart timer
         timerHandler.postDelayed(timerRunnable, 0);
-
         resumeGame();
     }
 
