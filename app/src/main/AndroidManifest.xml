@@ -27,7 +27,10 @@
         <!-- High Score Activity -->
         <activity
             android:name=".HighScoreActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize">
+        </activity>
 
         <!-- Game Settings Activity -->
         <activity

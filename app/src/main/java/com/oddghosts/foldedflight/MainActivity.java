@@ -58,9 +58,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "High Scores", Toast.LENGTH_SHORT).show();
-                // TODO: Create and navigate to HighScoresActivity
-                // Intent intent = new Intent(MainActivity.this, HighScoresActivity.class);
-                // startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, HighScoreActivity.class);
+                startActivity(intent);
             }
         });
 
