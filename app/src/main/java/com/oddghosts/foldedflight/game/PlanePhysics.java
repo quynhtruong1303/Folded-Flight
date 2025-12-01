@@ -4,7 +4,7 @@ package com.oddghosts.foldedflight.game;
  * Physics engine for the paper plane
  * Adapted from Elijah Camp
  * Created: 10/30/2025
- * Modified: Added speed limit and infinite scrolling support
+ * Modified: Added speed limit
  */
 public class PlanePhysics {
 

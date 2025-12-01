@@ -24,6 +24,11 @@
             </intent-filter>
         </activity>
 
+        <!-- High Score Activity -->
+        <activity
+            android:name=".HighScoreActivity"
+            android:exported="false" />
+
         <!-- Game Settings Activity -->
         <activity
             android:name=".GameSettingsActivity"

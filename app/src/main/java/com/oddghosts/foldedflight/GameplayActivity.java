@@ -233,7 +233,7 @@ public class GameplayActivity extends AppCompatActivity {
         // Reset timer
         elapsedTime = 0;
         startTime = System.currentTimeMillis();
-        timerText.setText("TIME: 00:00");
+        timerText.setText(R.string.start_timer);
 
         // Reset game surface
         if (gameSurfaceView != null) {

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/highScoreTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/high_score_text"
+        android:fontFamily="@font/pixelboy"
+        android:textSize="64sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/highScore1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/high_score_one"
+        android:fontFamily="@font/pixelboy"
+        android:paddingTop="16dp"
+        android:textSize="48sp" />
+    <TextView
+        android:id="@+id/highScore2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/high_score_two"
+        android:fontFamily="@font/pixelboy"
+        android:paddingTop="16dp"
+        android:textSize="48sp" />
+    <TextView
+        android:id="@+id/highScore3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/high_score_three"
+        android:fontFamily="@font/pixelboy"
+        android:paddingTop="16dp"
+        android:textSize="48sp" />
+    <TextView
+        android:id="@+id/highScore4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/high_score_four"
+        android:fontFamily="@font/pixelboy"
+        android:paddingTop="16dp"
+        android:textSize="48sp" />
+    <TextView
+        android:id="@+id/highScore5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/high_score_five"
+        android:fontFamily="@font/pixelboy"
+        android:paddingTop="16dp"
+        android:textSize="48sp" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="124dp"
+        android:src="@drawable/red_plane" />
+
+    <ImageView
+        android:id="@+id/imageView9"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="-250dp"
+        android:src="@drawable/crown_picsart_backgroundremover"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</LinearLayout>
