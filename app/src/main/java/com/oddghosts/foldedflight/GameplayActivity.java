@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -13,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import com.oddghosts.foldedflight.game.GameSurfaceView;
 import com.oddghosts.foldedflight.ui.PixelButton;
@@ -22,6 +24,8 @@ public class GameplayActivity extends AppCompatActivity {
     // UI Elements
     private TextView timerText;
     private GameSurfaceView gameSurfaceView;
+    private ImageButton moveUpButton;
+    private ImageButton moveDownButton;
 
     // Game State
     private boolean isPaused = false;
@@ -71,6 +75,9 @@ public class GameplayActivity extends AppCompatActivity {
         // Setup pause dialog
         setupPauseDialog();
 
+        // Setup back press handler
+        setupBackPressHandler();
+
         // Start the game
         startGame();
     }
@@ -79,6 +86,8 @@ public class GameplayActivity extends AppCompatActivity {
         timerText = findViewById(R.id.timerText);
         ImageButton pauseButton = findViewById(R.id.pauseButton);
         gameSurfaceView = findViewById(R.id.gameSurfaceView);
+        moveUpButton = findViewById(R.id.moveUpButton);
+        moveDownButton = findViewById(R.id.moveDownButton);
 
         // Set game settings (background automatically scales to fit height)
         gameSurfaceView.setGameSettings(selectedMap, selectedPlaneColor, difficulty);
@@ -88,6 +97,42 @@ public class GameplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 pauseGame();
+            }
+        });
+
+        // Move Up button listener - hold to move up
+        moveUpButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        v.performClick(); // Accessibility requirement
+                        gameSurfaceView.setUpPressed(true);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        gameSurfaceView.setUpPressed(false);
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        // Move Down button listener - hold to move down
+        moveDownButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        v.performClick(); // Accessibility requirement
+                        gameSurfaceView.setDownPressed(true);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        gameSurfaceView.setDownPressed(false);
+                        return true;
+                }
+                return false;
             }
         });
     }
@@ -193,6 +238,24 @@ public class GameplayActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Setup modern back press handler (replaces deprecated onBackPressed)
+     */
+    private void setupBackPressHandler() {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!isPaused) {
+                    pauseGame();
+                } else {
+                    // If already paused and back is pressed again, exit
+                    exitToMenu();
+                }
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
     private void startGame() {
         isGameRunning = true;
         startTime = System.currentTimeMillis();
@@ -265,14 +328,6 @@ public class GameplayActivity extends AppCompatActivity {
         timerHandler.removeCallbacks(timerRunnable);
         if (gameSurfaceView != null) {
             gameSurfaceView.stopGame();
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (!isPaused) {
-            pauseGame();
         }
     }
 }

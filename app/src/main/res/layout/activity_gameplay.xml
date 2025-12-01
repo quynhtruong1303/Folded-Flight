@@ -13,7 +13,7 @@
     <!-- Top UI Layer -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:padding="16dp">
 
         <!-- Timer Display -->
@@ -42,7 +42,38 @@
             android:background="@drawable/pause_button_bg"
             android:src="@drawable/ic_pause"
             android:scaleType="centerInside"
-            android:padding="12dp" />
+            android:padding="12dp"
+            android:contentDescription="@string/pause_text" />
+
+        <!-- Move Up Button -->
+        <ImageButton
+            android:id="@+id/moveUpButton"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="84dp"
+            android:background="@drawable/move_button_bg"
+            android:src="@drawable/ic_move_up"
+            android:scaleType="centerInside"
+            android:padding="16dp"
+            android:contentDescription="@string/move_up_text" />
+
+        <!-- Move Down Button -->
+        <ImageButton
+            android:id="@+id/moveDownButton"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/move_button_bg"
+            android:src="@drawable/ic_move_down"
+            android:scaleType="centerInside"
+            android:padding="16dp"
+            android:contentDescription="@string/move_down_text" />
 
     </RelativeLayout>
 

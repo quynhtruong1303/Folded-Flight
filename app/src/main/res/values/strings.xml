@@ -10,6 +10,7 @@
     <string name="back_button">BACK</string>
     <string name="start_timer">TIME: 00:00</string>
     <string name="paused_text">PAUSED</string>
+    <string name="pause_text">Pause</string>
     <string name="resume_text">RESUME</string>
     <string name="main_menu_text">MAIN MENU</string>
     <string name="restart_text">RESTART</string>
@@ -19,4 +20,6 @@
     <string name="high_score_three">3.) </string>
     <string name="high_score_four">4.) </string>
     <string name="high_score_five">5.) </string>
+    <string name="move_up_text">Move Up</string>
+    <string name="move_down_text">Move Down</string>
 </resources>

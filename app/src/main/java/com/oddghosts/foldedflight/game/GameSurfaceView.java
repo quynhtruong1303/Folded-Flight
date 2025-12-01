@@ -118,6 +118,27 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
     }
 
+    /**
+     * Public methods to control plane movement from buttons
+     */
+    public void setUpPressed(boolean pressed) {
+        if (isFlying) {
+            upPressed = pressed;
+            if (pressed) {
+                downPressed = false;
+            }
+        }
+    }
+
+    public void setDownPressed(boolean pressed) {
+        if (isFlying) {
+            downPressed = pressed;
+            if (pressed) {
+                upPressed = false;
+            }
+        }
+    }
+
     private void loadResources() {
         // Load background based on map type
         if (mapType.equals("CITY")) {
@@ -375,11 +396,8 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         strokePaint.setTextSize(60);
         fillPaint.setTextSize(60);
 
-        canvas.drawText("Hold UP side to climb", screenWidth / 2, screenHeight / 2 + 80, strokePaint);
-        canvas.drawText("Hold UP side to climb", screenWidth / 2, screenHeight / 2 + 80, fillPaint);
-
-        canvas.drawText("Hold DOWN side to dive", screenWidth / 2, screenHeight / 2 + 130, strokePaint);
-        canvas.drawText("Hold DOWN side to dive", screenWidth / 2, screenHeight / 2 + 130, fillPaint);
+        canvas.drawText("Use buttons to climb/dive", screenWidth / 2, screenHeight / 2 + 80, strokePaint);
+        canvas.drawText("Use buttons to climb/dive", screenWidth / 2, screenHeight / 2 + 80, fillPaint);
     }
 
     private void drawPlane(Canvas canvas) {
@@ -414,8 +432,6 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float y = event.getY();
-
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (!isFlying) {
@@ -423,35 +439,17 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     isFlying = true;
                     plane.launch(300, -80);
                     lastFrameTime = System.nanoTime();
-                } else {
-                    // Control the plane
-                    if (y < screenHeight / 2) {
-                        upPressed = true;
-                        downPressed = false;
-                    } else {
-                        downPressed = true;
-                        upPressed = false;
-                    }
+                    return true;
                 }
-                return true;
+                // Disable screen touch controls during flight
+                // Only buttons control the plane now
+                return false;
 
             case MotionEvent.ACTION_MOVE:
-                if (isFlying) {
-                    if (y < screenHeight / 2) {
-                        upPressed = true;
-                        downPressed = false;
-                    } else {
-                        downPressed = true;
-                        upPressed = false;
-                    }
-                }
-                return true;
-
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                upPressed = false;
-                downPressed = false;
-                return true;
+                // Disable all screen touch controls during flight
+                return false;
         }
 
         return super.onTouchEvent(event);

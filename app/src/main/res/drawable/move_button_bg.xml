@@ -2,8 +2,8 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="#3A7AC2" />
-            <stroke android:width="2dp" android:color="#2E5C8A" />
+            <solid android:color="#80757575" />
+            <stroke android:width="2dp" android:color="#80424242" />
             <corners android:radius="4dp" />
         </shape>
     </item>
@@ -12,15 +12,15 @@
             <!-- Shadow -->
             <item android:left="2dp" android:top="2dp">
                 <shape android:shape="rectangle">
-                    <solid android:color="#80242424" />
+                    <solid android:color="#80424242" />
                     <corners android:radius="4dp" />
                 </shape>
             </item>
             <!-- Main button -->
             <item android:bottom="2dp" android:right="2dp">
                 <shape android:shape="rectangle">
-                    <solid android:color="#80808080" />
-                    <stroke android:width="2dp" android:color="#2E5C8A" />
+                    <solid android:color="#809E9E9E" />
+                    <stroke android:width="2dp" android:color="#80616161" />
                     <corners android:radius="4dp" />
                 </shape>
             </item>
