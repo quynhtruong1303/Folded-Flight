@@ -19,7 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.oddghosts.foldedflight.game.GameSurfaceView;
 import com.oddghosts.foldedflight.ui.PixelButton;
 
-public class GameplayActivity extends AppCompatActivity implements GameSurfaceView.GameOverListener, GameSurfaceView.LaunchListener {
+public class GameplayActivity extends AppCompatActivity implements GameSurfaceView.GameOverListener, GameSurfaceView.LaunchListener, GameSurfaceView.GameOverButtonListener {
     // UI Elements
     private TextView timerText;
     private GameSurfaceView gameSurfaceView;
@@ -96,6 +96,9 @@ public class GameplayActivity extends AppCompatActivity implements GameSurfaceVi
 
         //For timer on launch
         gameSurfaceView.setLaunchListener(this);
+
+        // Set game over button listener
+        gameSurfaceView.setGameOverButtonListener(this);
 
         // Pause button listener
         pauseButton.setOnClickListener(new View.OnClickListener() {
@@ -350,5 +353,15 @@ public class GameplayActivity extends AppCompatActivity implements GameSurfaceVi
 
         // Save the most coins if it's a new record
         HighScoreActivity.saveMostCoins(this, coins);
+    }
+
+    @Override
+    public void onRestartClicked() {
+        restartGame();
+    }
+
+    @Override
+    public void onMainMenuClicked() {
+        exitToMenu();
     }
 }

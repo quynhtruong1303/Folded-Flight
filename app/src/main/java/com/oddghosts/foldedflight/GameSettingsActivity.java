@@ -3,7 +3,6 @@ package com.oddghosts.foldedflight;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.oddghosts.foldedflight.ui.PixelCard;
 import com.oddghosts.foldedflight.ui.PixelButton;
@@ -73,7 +72,6 @@ public class GameSettingsActivity extends AppCompatActivity {
                 cityCard.setSelected(true);
                 forestCard.setSelected(false);
                 selectedMap = "CITY";
-                Toast.makeText(GameSettingsActivity.this, "City Map Selected", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -83,7 +81,6 @@ public class GameSettingsActivity extends AppCompatActivity {
                 forestCard.setSelected(true);
                 cityCard.setSelected(false);
                 selectedMap = "FOREST";
-                Toast.makeText(GameSettingsActivity.this, "Forest Map Selected", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -138,8 +135,6 @@ public class GameSettingsActivity extends AppCompatActivity {
         // Select the clicked one
         selectedCard.setSelected(true);
         selectedPlaneColor = color;
-
-        Toast.makeText(this, color + " Plane Selected", Toast.LENGTH_SHORT).show();
     }
 
     private void setupDifficultyCards() {
@@ -178,8 +173,6 @@ public class GameSettingsActivity extends AppCompatActivity {
         // Select the clicked one
         selectedCard.setSelected(true);
         selectedDifficulty = difficulty;
-
-        Toast.makeText(this, difficulty + " Difficulty Selected", Toast.LENGTH_SHORT).show();
     }
 
     private void setupButtons() {
@@ -222,8 +215,6 @@ public class GameSettingsActivity extends AppCompatActivity {
         intent.putExtra("PLANE_COLOR", selectedPlaneColor);
         intent.putExtra("DIFFICULTY", selectedDifficulty);
         startActivity(intent);
-
-
         finish();
     }
 }

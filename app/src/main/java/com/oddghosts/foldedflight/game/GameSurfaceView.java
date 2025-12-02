@@ -31,6 +31,11 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         void onLaunch();
     }
 
+    public interface GameOverButtonListener {
+        void onRestartClicked();
+        void onMainMenuClicked();
+    }
+
     // Thread and running state
     private Thread gameThread;
     private boolean isRunning = false;
@@ -108,8 +113,11 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     // Callback for game over event
     private GameOverListener gameOverListener;
 
-    //For Launch to start timer 
+    //For Launch to start timer
     private LaunchListener launchListener;
+
+    // Callback for game over button events
+    private GameOverButtonListener gameOverButtonListener;
 
     // Obstacle definition class
     private static class ObstacleDefinition {
@@ -651,8 +659,8 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         fillPaint.setTypeface(customTypeface);
 
         // Game Over text
-        canvas.drawText("GAME OVER!", screenWidth / 2, screenHeight / 2 - 50, strokePaint);
-        canvas.drawText("GAME OVER!", screenWidth / 2, screenHeight / 2 - 50, fillPaint);
+        canvas.drawText("GAME OVER!", screenWidth / 2, screenHeight / 2 - 150, strokePaint);
+        canvas.drawText("GAME OVER!", screenWidth / 2, screenHeight / 2 - 150, fillPaint);
 
         // Stats
         fillPaint.setColor(Color.WHITE);
@@ -661,14 +669,108 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         strokePaint.setStrokeWidth(6);
 
         String stats = String.format("Distance: %.0fm | Time: %.1fs", plane.getX() / 10, survivalTimeSeconds);
-        canvas.drawText(stats, screenWidth / 2, screenHeight / 2 + 50, strokePaint);
-        canvas.drawText(stats, screenWidth / 2, screenHeight / 2 + 50, fillPaint);
+        canvas.drawText(stats, screenWidth / 2, screenHeight / 2 - 50, strokePaint);
+        canvas.drawText(stats, screenWidth / 2, screenHeight / 2 - 50, fillPaint);
 
         if (coinSprite != null) {
             String coinText = "Coins: " + coinCount;
-            canvas.drawText(coinText, screenWidth / 2, screenHeight / 2 + 120, strokePaint);
-            canvas.drawText(coinText, screenWidth / 2, screenHeight / 2 + 120, fillPaint);
+            canvas.drawText(coinText, screenWidth / 2, screenHeight / 2 + 20, strokePaint);
+            canvas.drawText(coinText, screenWidth / 2, screenHeight / 2 + 20, fillPaint);
         }
+
+        // Draw buttons
+        drawGameOverButtons(canvas, customTypeface);
+    }
+
+    /**
+     * Draw restart and main menu buttons on game over screen
+     */
+    private void drawGameOverButtons(Canvas canvas, Typeface customTypeface) {
+        // Button dimensions
+        int buttonWidth = 250;
+        int buttonHeight = 80;
+        int buttonSpacing = 30;
+        int totalWidth = (buttonWidth * 2) + buttonSpacing;
+        int startX = (screenWidth - totalWidth) / 2;
+        int buttonY = screenHeight / 2 + 100;
+
+        // Button colors
+        int restartColor = 0xFF4A90E2;  // Blue
+        int mainMenuColor = 0xFF9E9E9E; // Gray
+        int borderColor = 0xFF2E5C8A;
+        int shadowColor = 0xFF1A3A5A;
+
+        Paint buttonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setStrokeWidth(6);
+
+        Paint shadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        shadowPaint.setColor(shadowColor);
+
+        Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setColor(Color.WHITE);
+        textPaint.setTextSize(48);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setTypeface(customTypeface);
+
+        // Draw Restart button
+        // Shadow
+        canvas.drawRect(startX + 6, buttonY + 6, startX + buttonWidth + 6, buttonY + buttonHeight + 6, shadowPaint);
+        // Button
+        buttonPaint.setColor(restartColor);
+        canvas.drawRect(startX, buttonY, startX + buttonWidth, buttonY + buttonHeight, buttonPaint);
+        // Border
+        borderPaint.setColor(borderColor);
+        canvas.drawRect(startX, buttonY, startX + buttonWidth, buttonY + buttonHeight, borderPaint);
+        // Text
+        canvas.drawText("RESTART", startX + buttonWidth / 2, buttonY + buttonHeight / 2 + 16, textPaint);
+
+        // Draw Main Menu button
+        int mainMenuX = startX + buttonWidth + buttonSpacing;
+        // Shadow
+        canvas.drawRect(mainMenuX + 6, buttonY + 6, mainMenuX + buttonWidth + 6, buttonY + buttonHeight + 6, shadowPaint);
+        // Button
+        buttonPaint.setColor(mainMenuColor);
+        canvas.drawRect(mainMenuX, buttonY, mainMenuX + buttonWidth, buttonY + buttonHeight, buttonPaint);
+        // Border
+        canvas.drawRect(mainMenuX, buttonY, mainMenuX + buttonWidth, buttonY + buttonHeight, borderPaint);
+        // Text
+        canvas.drawText("MAIN MENU", mainMenuX + buttonWidth / 2, buttonY + buttonHeight / 2 + 16, textPaint);
+    }
+
+    /**
+     * Check if a touch event hit one of the game over buttons
+     */
+    private boolean handleGameOverTouch(float touchX, float touchY) {
+        // Button dimensions (must match drawGameOverButtons)
+        int buttonWidth = 250;
+        int buttonHeight = 80;
+        int buttonSpacing = 30;
+        int totalWidth = (buttonWidth * 2) + buttonSpacing;
+        int startX = (screenWidth - totalWidth) / 2;
+        int buttonY = screenHeight / 2 + 100;
+
+        // Restart button bounds
+        if (touchX >= startX && touchX <= startX + buttonWidth &&
+                touchY >= buttonY && touchY <= buttonY + buttonHeight) {
+            if (gameOverButtonListener != null) {
+                gameOverButtonListener.onRestartClicked();
+            }
+            return true;
+        }
+
+        // Main Menu button bounds
+        int mainMenuX = startX + buttonWidth + buttonSpacing;
+        if (touchX >= mainMenuX && touchX <= mainMenuX + buttonWidth &&
+                touchY >= buttonY && touchY <= buttonY + buttonHeight) {
+            if (gameOverButtonListener != null) {
+                gameOverButtonListener.onMainMenuClicked();
+            }
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -922,10 +1024,19 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     public void setGameOverListener(GameOverListener listener) {
         this.gameOverListener = listener;
     }
+
     //for timer on launch
     public void setLaunchListener(LaunchListener listener) {
         this.launchListener = listener;
     }
+
+    /**
+     * Set the game over button listener
+     */
+    public void setGameOverButtonListener(GameOverButtonListener listener) {
+        this.gameOverButtonListener = listener;
+    }
+
     /**
      * Get the current distance traveled in meters
      */
@@ -951,13 +1062,16 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (!isFlying && !isGameOver) {
+                if (isGameOver) {
+                    // Handle game over button clicks
+                    return handleGameOverTouch(event.getX(), event.getY());
+                } else if (!isFlying) {
                     // Launch the plane
                     isFlying = true;
                     survivalTimeSeconds = 0f;
                     if (launchListener != null) {
                         launchListener.onLaunch();
-                    }  // Reset timer on launch
+                    }
                     plane.launch(300, -80);
                     lastFrameTime = System.nanoTime();
                     lastObstacleSpawnTime = System.currentTimeMillis();

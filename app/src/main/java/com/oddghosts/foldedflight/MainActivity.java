@@ -3,7 +3,6 @@ package com.oddghosts.foldedflight;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.oddghosts.foldedflight.ui.PixelButton;
 
@@ -57,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
         highScoresButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "High Scores", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, HighScoreActivity.class);
                 startActivity(intent);
             }
