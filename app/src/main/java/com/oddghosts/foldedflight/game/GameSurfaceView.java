@@ -248,15 +248,15 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
      * Load obstacle sprites based on map type with proper sizing requirements
      *
      * City Map (5 obstacles):
-     * - Building: ground, 85% screen height (very tall obstacle)
+     * - Building: ground, 50% screen height (very tall obstacle)
      * - Jet, Alien: top half, max 1/3 screen
      * - Bird: top half, 1/5 screen
-     * - Lamppost: ground, 1/4 screen
+     * - Lamppost: ground, 30% screen
      *
      * Forest Map:
      * - Tree: like building (ground, 85% screen)
      * - Ghost_1, Ghost_2: like jet/alien (top half, max 1/3 screen)
-     * - Zombie: like lamppost (ground, 1/4 screen)
+     * - Zombie: like lamppost (ground, 30% screen)
      */
     private void loadObstacleSprites() {
         cityObstacles = new ObstacleSet();
@@ -286,7 +286,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             try { forestObstacles.add("tree", true, 0.50f, R.drawable.tree); } catch (Exception e) {}
 
             // Zombie - ground, 1/4 screen (like lamppost)
-            forestObstacles.add("zombie", true, 0.40f, R.drawable.zombie);
+            forestObstacles.add("zombie", true, 0.30f, R.drawable.zombie);
 
             // Flying obstacles - top half, max 1/3 screen
             try { forestObstacles.add("ghost_1", false, 0.3f, R.drawable.ghost_1); } catch (Exception e) {}
