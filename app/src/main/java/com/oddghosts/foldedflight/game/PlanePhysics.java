@@ -4,7 +4,7 @@ package com.oddghosts.foldedflight.game;
  * Physics engine for the paper plane
  * Adapted from Elijah Camp
  * Created: 10/30/2025
- * Modified: Added speed limit
+ * Modified: Added speed limit, angle of attack aerodynamics
  */
 public class PlanePhysics {
 
@@ -31,14 +31,25 @@ public class PlanePhysics {
     private static final float GRAVITY = 500.0f; // Pixels per second squared
     private float dragCoefficient = 0.005f;
 
+    // Angle of Attack constants
+    private static final float CLIMB_DRAG_MULTIPLIER = 2.5f;  // Climbing = more drag
+    private static final float DIVE_DRAG_MULTIPLIER = 0.4f;   // Diving = less drag
+    private static final float DIVE_SPEED_BOOST = 150.0f;     // Bonus acceleration when diving
+    private static final float STALL_ANGLE = 0.6f;            // ~34 degrees - steep climb triggers stall
+    private static final float STALL_PENALTY = 300.0f;        // Extra downward force when stalling
+
     // World bounds
     private float worldWidth = 800;
     private float worldHeight = 600;
 
     // Bounce and friction coefficients
     private static final float BOUNCE_DAMPING = 0.6f;
-    private static final float GROUND_FRICTION = 0.95f; // Reduced friction to keep moving
-    private static final float MIN_FORWARD_VELOCITY = 100.0f; // Minimum forward speed
+    private static final float GROUND_FRICTION = 0.95f;
+    private static final float MIN_FORWARD_VELOCITY = 100.0f;
+
+    // Current angle of attack (for external use, e.g., UI display)
+    private float currentAngleOfAttack = 0f;
+    private boolean isStalling = false;
 
     public PlanePhysics(float x, float y, float radius, float mass) {
         this.x = x;
@@ -66,7 +77,10 @@ public class PlanePhysics {
         // Apply gravity
         accelY += GRAVITY;
 
-        // Apply drag
+        // Apply angle-of-attack aerodynamics
+        applyAngleOfAttack(deltaTime);
+
+        // Apply drag (now modified by angle of attack)
         applyDrag();
 
         // Update velocity
@@ -94,15 +108,66 @@ public class PlanePhysics {
     }
 
     /**
+     * Apply angle of attack physics
+     * Climbing = more drag, lose speed
+     * Diving = less drag, gain speed
+     * Steep climb = stall (nose drops)
+     */
+    private void applyAngleOfAttack(float deltaTime) {
+        float speed = (float) Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+        if (speed < 0.01f) {
+            currentAngleOfAttack = 0;
+            isStalling = false;
+            return;
+        }
+
+        // Calculate angle of attack: ratio of vertical to horizontal velocity
+        // Negative = climbing, Positive = diving
+        currentAngleOfAttack = velocityY / speed;
+
+        // Check for stall condition (climbing too steeply with low speed)
+        if (currentAngleOfAttack < -STALL_ANGLE && speed < 400) {
+            isStalling = true;
+            // Stall: plane nose drops, loses lift
+            accelY += STALL_PENALTY;
+            // Also lose forward momentum during stall
+            accelX -= 50.0f;
+        } else {
+            isStalling = false;
+        }
+
+        // Diving boost: gain speed when pointing downward
+        if (currentAngleOfAttack > 0.3f) {
+            // Convert potential energy to speed (like real physics!)
+            accelX += DIVE_SPEED_BOOST * currentAngleOfAttack;
+        }
+    }
+
+    /**
      * Apply drag force (air resistance)
+     * Modified by angle of attack
      */
     private void applyDrag() {
         float speed = (float) Math.sqrt(velocityX * velocityX + velocityY * velocityY);
 
         if (speed > 0.01f) {
-            // Simple linear drag model
-            accelX -= dragCoefficient * velocityX;
-            accelY -= dragCoefficient * velocityY;
+            // Calculate drag multiplier based on angle of attack
+            float dragMultiplier = 1.0f;
+
+            if (currentAngleOfAttack < -0.1f) {
+                // Climbing: interpolate toward max climb drag
+                float climbFactor = Math.min(1.0f, -currentAngleOfAttack / STALL_ANGLE);
+                dragMultiplier = 1.0f + (CLIMB_DRAG_MULTIPLIER - 1.0f) * climbFactor;
+            } else if (currentAngleOfAttack > 0.1f) {
+                // Diving: interpolate toward min dive drag
+                float diveFactor = Math.min(1.0f, currentAngleOfAttack / 0.7f);
+                dragMultiplier = 1.0f - (1.0f - DIVE_DRAG_MULTIPLIER) * diveFactor;
+            }
+
+            // Apply modified drag
+            float effectiveDrag = dragCoefficient * dragMultiplier;
+            accelX -= effectiveDrag * velocityX;
+            accelY -= effectiveDrag * velocityY;
         }
     }
 
@@ -123,6 +188,9 @@ public class PlanePhysics {
             if (velocityX < MIN_FORWARD_VELOCITY) {
                 velocityX = MIN_FORWARD_VELOCITY;
             }
+
+            // Reset stall on ground contact
+            isStalling = false;
         }
 
         // Top collision
@@ -180,6 +248,22 @@ public class PlanePhysics {
     }
 
     /**
+     * Get current angle of attack
+     * Negative = climbing, Positive = diving
+     * Range roughly -1 to 1
+     */
+    public float getAngleOfAttack() {
+        return currentAngleOfAttack;
+    }
+
+    /**
+     * Check if plane is currently stalling
+     */
+    public boolean isStalling() {
+        return isStalling;
+    }
+
+    /**
      * Check if the plane is still moving
      */
     public boolean isMoving() {
@@ -196,6 +280,8 @@ public class PlanePhysics {
         this.velocityY = 0;
         this.accelX = 0;
         this.accelY = 0;
+        this.currentAngleOfAttack = 0;
+        this.isStalling = false;
     }
 
     // Getters
