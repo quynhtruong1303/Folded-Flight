@@ -27,6 +27,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         void onGameOver(int distance, int coins);
     }
 
+    public interface LaunchListener {
+        void onLaunch();
+    }
+
     // Thread and running state
     private Thread gameThread;
     private boolean isRunning = false;
@@ -103,6 +107,9 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     // Callback for game over event
     private GameOverListener gameOverListener;
+
+    //For Launch to start timer 
+    private LaunchListener launchListener;
 
     // Obstacle definition class
     private static class ObstacleDefinition {
@@ -439,7 +446,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void update(float deltaTime) {
-        if (!isFlying || plane == null || isGameOver) return;
+        if (!isFlying || plane == null || isGameOver || isPaused) return;
 
         // Update survival time
         survivalTimeSeconds += deltaTime;
@@ -838,7 +845,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void checkCoinCollections() {
-        if (!isFlying || plane == null) return;
+        if (!isFlying || plane == null || isGameOver || isPaused) return;
         if (coins.isEmpty()) return;
 
         Rect planeRect = getPlaneBounds();
@@ -874,7 +881,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void checkCollisions() {
-        if (!isFlying || plane == null || isGameOver) return;
+        if (!isFlying || plane == null || isGameOver || isPaused) return;
 
         Rect planeRect = getPlaneBounds();
 
@@ -915,7 +922,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     public void setGameOverListener(GameOverListener listener) {
         this.gameOverListener = listener;
     }
-
+    //for timer on launch
+    public void setLaunchListener(LaunchListener listener) {
+        this.launchListener = listener;
+    }
     /**
      * Get the current distance traveled in meters
      */
@@ -944,6 +954,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 if (!isFlying && !isGameOver) {
                     // Launch the plane
                     isFlying = true;
+                    survivalTimeSeconds = 0f;
+                    if (launchListener != null) {
+                        launchListener.onLaunch();
+                    }  // Reset timer on launch
                     plane.launch(300, -80);
                     lastFrameTime = System.nanoTime();
                     lastObstacleSpawnTime = System.currentTimeMillis();

@@ -19,8 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.oddghosts.foldedflight.game.GameSurfaceView;
 import com.oddghosts.foldedflight.ui.PixelButton;
 
-public class GameplayActivity extends AppCompatActivity implements GameSurfaceView.GameOverListener {
-
+public class GameplayActivity extends AppCompatActivity implements GameSurfaceView.GameOverListener, GameSurfaceView.LaunchListener {
     // UI Elements
     private TextView timerText;
     private GameSurfaceView gameSurfaceView;
@@ -94,6 +93,9 @@ public class GameplayActivity extends AppCompatActivity implements GameSurfaceVi
 
         // Set game over listener to save scores
         gameSurfaceView.setGameOverListener(this);
+
+        //For timer on launch
+        gameSurfaceView.setLaunchListener(this);
 
         // Pause button listener
         pauseButton.setOnClickListener(new View.OnClickListener() {
@@ -262,7 +264,6 @@ public class GameplayActivity extends AppCompatActivity implements GameSurfaceVi
     private void startGame() {
         isGameRunning = true;
         startTime = System.currentTimeMillis();
-        timerHandler.postDelayed(timerRunnable, 0);
         gameSurfaceView.startGame();
     }
 
@@ -325,6 +326,12 @@ public class GameplayActivity extends AppCompatActivity implements GameSurfaceVi
     }
 
     @Override
+    public void onLaunch() {
+        startTime = System.currentTimeMillis();
+        timerHandler.postDelayed(timerRunnable, 0);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         isGameRunning = false;
@@ -336,6 +343,8 @@ public class GameplayActivity extends AppCompatActivity implements GameSurfaceVi
 
     @Override
     public void onGameOver(int distance, int coins) {
+        timerHandler.removeCallbacks(timerRunnable);
+
         // Save the score (distance in meters)
         HighScoreActivity.saveScore(this, distance);
 
