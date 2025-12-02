@@ -51,8 +51,8 @@ public class Obstacle {
     // Collision bounds in WORLD coordinates
     public Rect getBounds() {
         // Hitbox is half the sprite size
-        float hitboxWidth = width * 0.15f;
-        float hitboxHeight = height * 0.15f;
+        float hitboxWidth = width * 0.75f;
+        float hitboxHeight = height * 0.75f;
 
         // Center the hitbox inside the sprite
         float left = x + (width - hitboxWidth) / 2f;

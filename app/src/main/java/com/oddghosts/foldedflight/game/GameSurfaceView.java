@@ -751,15 +751,57 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         float width = coinSize;
         float height = coinSize;
 
-        // Random vertical position, avoid extreme top/bottom
-        float minY = 150f;
-        float maxY = screenHeight - height - 150f;
-        float y = minY + random.nextFloat() * (maxY - minY);
-
         // World X: just off the right edge of the camera view
         float x = cameraX + screenWidth + width;
 
-        coins.add(new Coin(x, y, width, height, coinSprite));
+        // Safety margin around obstacles (coins won't spawn within this distance)
+        float safetyMargin = coinSize * 1.5f; // 1.5x coin size for comfortable spacing
+
+        // Try to find a safe Y position that doesn't overlap with obstacles
+        float y = -1;
+        int maxAttempts = 10; // Try up to 10 times to find safe position
+        int successAttempt = 0;
+
+        for (int attempt = 0; attempt < maxAttempts; attempt++) {
+            // Random vertical position, avoid extreme top/bottom
+            float minY = 150f;
+            float maxY = screenHeight - height - 150f;
+            float candidateY = minY + random.nextFloat() * (maxY - minY);
+
+            // Create expanded coin bounds with safety margin
+            Rect coinBoundsWithMargin = new Rect(
+                    (int) (x - safetyMargin),
+                    (int) (candidateY - safetyMargin),
+                    (int) (x + width + safetyMargin),
+                    (int) (candidateY + height + safetyMargin)
+            );
+
+            // Check if this position (with margin) overlaps with any obstacle
+            boolean safePosition = true;
+            for (Obstacle o : obstacles) {
+                // Check if coin (with margin) would overlap with obstacle hitbox
+                if (Rect.intersects(coinBoundsWithMargin, o.getBounds())) {
+                    safePosition = false;
+                    break;
+                }
+            }
+
+            // If position is safe, use it
+            if (safePosition) {
+                y = candidateY;
+                successAttempt = attempt + 1;
+                break;
+            }
+        }
+
+        // Only spawn coin if we found a safe position
+        if (y >= 0) {
+            coins.add(new Coin(x, y, width, height, coinSprite));
+            android.util.Log.d("Coin", String.format("Spawned coin at y=%.0f (found safe spot in %d attempts)", y, successAttempt));
+        } else {
+            // If no safe position found after max attempts, skip spawning this coin
+            android.util.Log.d("Coin", "Skipped coin spawn - no safe position found (obstacles blocking all positions)");
+        }
     }
 
     private void updateCoins(float deltaTime) {
@@ -847,6 +889,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         isGameOver = true;
         upPressed = false;
         downPressed = false;
+
         // The game will continue running but won't accept input
         // Player can use pause menu to restart or exit
     }
