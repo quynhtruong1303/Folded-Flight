@@ -19,7 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.oddghosts.foldedflight.game.GameSurfaceView;
 import com.oddghosts.foldedflight.ui.PixelButton;
 
-public class GameplayActivity extends AppCompatActivity {
+public class GameplayActivity extends AppCompatActivity implements GameSurfaceView.GameOverListener {
 
     // UI Elements
     private TextView timerText;
@@ -91,6 +91,9 @@ public class GameplayActivity extends AppCompatActivity {
 
         // Set game settings (background automatically scales to fit height)
         gameSurfaceView.setGameSettings(selectedMap, selectedPlaneColor, difficulty);
+
+        // Set game over listener to save scores
+        gameSurfaceView.setGameOverListener(this);
 
         // Pause button listener
         pauseButton.setOnClickListener(new View.OnClickListener() {
@@ -329,5 +332,14 @@ public class GameplayActivity extends AppCompatActivity {
         if (gameSurfaceView != null) {
             gameSurfaceView.stopGame();
         }
+    }
+
+    @Override
+    public void onGameOver(int distance, int coins) {
+        // Save the score (distance in meters)
+        HighScoreActivity.saveScore(this, distance);
+
+        // Save the most coins if it's a new record
+        HighScoreActivity.saveMostCoins(this, coins);
     }
 }

@@ -23,10 +23,12 @@ public class HighScoreActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "FoldedFlightPrefs";
     private static final String HIGH_SCORES_KEY = "high_scores";
+    private static final String MOST_COINS_KEY = "most_coins";
     private static final int MAX_HIGH_SCORES = 5;
 
     private TextView highScoreTitle;
     private TextView highScore1, highScore2, highScore3, highScore4, highScore5;
+    private TextView mostCoinsText;
     private PixelButton backButton;
 
     @Override
@@ -42,6 +44,7 @@ public class HighScoreActivity extends AppCompatActivity {
         highScore3 = findViewById(R.id.highScore3);
         highScore4 = findViewById(R.id.highScore4);
         highScore5 = findViewById(R.id.highScore5);
+        mostCoinsText = findViewById(R.id.mostCoinsText);
         backButton = findViewById(R.id.backButton);
 
         // Setup back button
@@ -49,6 +52,9 @@ public class HighScoreActivity extends AppCompatActivity {
 
         // Load and display high scores
         loadHighScores();
+
+        // Load and display most coins
+        loadMostCoins();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -181,5 +187,41 @@ public class HighScoreActivity extends AppCompatActivity {
 
         // Check if new score is higher than the lowest high score
         return scores.isEmpty() || score > scores.get(0);
+    }
+
+    /**
+     * Load and display the most coins collected
+     */
+    private void loadMostCoins() {
+        int mostCoins = getMostCoinsFromPrefs();
+        mostCoinsText.setText("Most Coins: " + mostCoins);
+    }
+
+    /**
+     * Get most coins from SharedPreferences
+     */
+    private int getMostCoinsFromPrefs() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        return prefs.getInt(MOST_COINS_KEY, 0);
+    }
+
+    /**
+     * Save coins if it's a new record (static method to be called from GameplayActivity)
+     */
+    public static void saveMostCoins(android.content.Context context, int coins) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int currentMost = prefs.getInt(MOST_COINS_KEY, 0);
+
+        if (coins > currentMost) {
+            prefs.edit().putInt(MOST_COINS_KEY, coins).apply();
+        }
+    }
+
+    /**
+     * Get the current most coins record (static method)
+     */
+    public static int getMostCoins(android.content.Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        return prefs.getInt(MOST_COINS_KEY, 0);
     }
 }

@@ -14,7 +14,7 @@
     <string name="resume_text">RESUME</string>
     <string name="main_menu_text">MAIN MENU</string>
     <string name="restart_text">RESTART</string>
-    <string name="high_score_text">High Score</string>
+    <string name="high_score_text">High Scores</string>
     <string name="high_score_one">1.) </string>
     <string name="high_score_two">2.) </string>
     <string name="high_score_three">3.) </string>
@@ -22,4 +22,5 @@
     <string name="high_score_five">5.) </string>
     <string name="move_up_text">Move Up</string>
     <string name="move_down_text">Move Down</string>
+    <string name="most_coins_text">Most Coins Collected: 0</string>
 </resources>

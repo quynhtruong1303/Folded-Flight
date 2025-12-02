@@ -23,6 +23,10 @@ import java.util.Random;
 
 public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
 
+    public interface GameOverListener {
+        void onGameOver(int distance, int coins);
+    }
+
     // Thread and running state
     private Thread gameThread;
     private boolean isRunning = false;
@@ -96,6 +100,9 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     // Game over flag
     private boolean isGameOver = false;
+
+    // Callback for game over event
+    private GameOverListener gameOverListener;
 
     // Obstacle definition class
     private static class ObstacleDefinition {
@@ -890,8 +897,44 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         upPressed = false;
         downPressed = false;
 
+        // Calculate final distance (plane.getX() / 10 = distance in meters)
+        int finalDistance = plane != null ? (int)(plane.getX() / 10) : 0;
+
+        // Notify listener about game over with score and coins
+        if (gameOverListener != null) {
+            gameOverListener.onGameOver(finalDistance, coinCount);
+        }
+
         // The game will continue running but won't accept input
         // Player can use pause menu to restart or exit
+    }
+
+    /**
+     * Set the game over listener
+     */
+    public void setGameOverListener(GameOverListener listener) {
+        this.gameOverListener = listener;
+    }
+
+    /**
+     * Get the current distance traveled in meters
+     */
+    public int getDistance() {
+        return plane != null ? (int)(plane.getX() / 10) : 0;
+    }
+
+    /**
+     * Get the current coin count
+     */
+    public int getCoinCount() {
+        return coinCount;
+    }
+
+    /**
+     * Check if the game is over
+     */
+    public boolean isGameOver() {
+        return isGameOver;
     }
 
     @Override

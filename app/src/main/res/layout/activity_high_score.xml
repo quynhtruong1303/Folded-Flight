@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:text="@string/high_score_text"
             android:fontFamily="@font/pixelboy"
-            android:textSize="64sp"
+            android:textSize="54sp"
             android:textStyle="bold" />
 
         <TextView
@@ -40,7 +40,7 @@
             android:text="@string/high_score_one"
             android:fontFamily="@font/pixelboy"
             android:paddingTop="16dp"
-            android:textSize="48sp" />
+            android:textSize="32sp" />
         <TextView
             android:id="@+id/highScore2"
             android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
             android:text="@string/high_score_two"
             android:fontFamily="@font/pixelboy"
             android:paddingTop="16dp"
-            android:textSize="48sp" />
+            android:textSize="32sp" />
         <TextView
             android:id="@+id/highScore3"
             android:layout_width="wrap_content"
@@ -56,7 +56,7 @@
             android:text="@string/high_score_three"
             android:fontFamily="@font/pixelboy"
             android:paddingTop="16dp"
-            android:textSize="48sp" />
+            android:textSize="32sp" />
         <TextView
             android:id="@+id/highScore4"
             android:layout_width="wrap_content"
@@ -64,7 +64,7 @@
             android:text="@string/high_score_four"
             android:fontFamily="@font/pixelboy"
             android:paddingTop="16dp"
-            android:textSize="48sp" />
+            android:textSize="32sp" />
         <TextView
             android:id="@+id/highScore5"
             android:layout_width="wrap_content"
@@ -72,7 +72,16 @@
             android:text="@string/high_score_five"
             android:fontFamily="@font/pixelboy"
             android:paddingTop="16dp"
-            android:textSize="48sp" />
+            android:textSize="32sp" />
+        <TextView
+            android:id="@+id/mostCoinsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/most_coins_text"
+            android:fontFamily="@font/pixelboy"
+            android:paddingTop="32dp"
+            android:textSize="48sp"
+            android:textColor="#FFD700" />
     </LinearLayout>
 
     <LinearLayout
